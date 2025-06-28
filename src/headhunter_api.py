@@ -3,8 +3,6 @@ from typing import Optional
 
 import requests
 
-from src.config import URL_VAC, HEADERS, PARAMS_VAC, EMPLOYER_ID_KEY, PAGE_KEY, DATA_KEY, PARAMS_EMP, URL_EMP
-
 
 class HeadHunterAPI:
     """Класс для работы с API HeadHunter."""
@@ -16,32 +14,32 @@ class HeadHunterAPI:
     def __init__(self) -> None:
         """Инициализирует экземпляр класса с настройками для запросов к API."""
         self.__url = ""
-        self.__headers = HEADERS
+        self.__headers = {"User-Agent": "HH-User-Agent"}
         self.__params = ""
 
     def load_vacancies(self, employer_id: str) -> list:
         """Загружает данные о вакансиях по работодателю."""
-        self.__params = PARAMS_VAC
-        self.__url = URL_VAC
-        self.__params[EMPLOYER_ID_KEY] = employer_id
+        self.__params = {"page": 0, "per_page": 100, "employer_id": ""}
+        self.__url = "https://api.hh.ru/vacancies"
+        self.__params["employer_id"] = employer_id
         vacancies = []
-        while self.__params.get(PAGE_KEY) != 20:
+        while self.__params.get("page") != 20:
             response = self._Parser__get_request()
             if not response:
                 return []
             try:
-                vacancy = response.json()[DATA_KEY]
+                vacancy = response.json()["items"]
             except JSONDecodeError:
-                self.__params[PAGE_KEY] += 1
+                self.__params["page"] += 1
                 continue
             vacancies.extend(vacancy)
-            self.__params[PAGE_KEY] += 1
-        self.__params[PAGE_KEY] = 0
+            self.__params["page"] += 1
+        self.__params["page"] = 0
         return vacancies
 
     def load_employer(self, employer_id: str) -> dict:
-        self.__params = PARAMS_EMP
-        self.__url = f"{URL_EMP}/{employer_id}"
+        self.__params = {"page": 0, "per_page": 100}
+        self.__url = f"https://api.hh.ru/employers/{employer_id}"
         response = self._Parser__get_request()
         if not response:
             return {}
