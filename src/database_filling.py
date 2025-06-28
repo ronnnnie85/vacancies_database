@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2._psycopg import quote_ident
 
 from src.config import config
 
@@ -11,21 +12,30 @@ class DatabaseFilling:
     def __init__(self, database_name: str) -> None:
         self.__database_name = database_name
 
+        self.__database_checking()
+        self.__tables_checking()
+
 
     def __database_checking(self) -> None:
         params = config()
 
         with psycopg2.connect(dbname="postgres", **params) as conn:
             with conn.cursor() as cur:
+                conn.autocommit = True
+
                 cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (self.__database_name,))
                 exists = cur.fetchone()
 
                 if not exists:
-                    cur.execute("CREATE DATABASE %s", (self.__database_name,))
+                    safe_db_name = quote_ident(self.__database_name, conn)
+                    cur.execute(f"CREATE DATABASE {safe_db_name}")
                     conn.commit()
 
     def __tables_checking(self) -> None:
         params = config()
+
+        print("DB Name:", self.__database_name)
+        print("Params:", params)
 
         with psycopg2.connect(dbname=self.__database_name, **params) as conn:
             with conn.cursor() as cur:
@@ -57,7 +67,7 @@ class DatabaseFilling:
     def employers_filling(self, employers: list) -> None:
         params = config()
 
-        with psycopg2.connect(dbname=self.__database_name, **params) as conn:
+        with psycopg2.connect(dbname=self.__database_name, **params)  as conn:
             with conn.cursor() as cur:
                 for emp in employers:
                     id_emp = emp.get("id")

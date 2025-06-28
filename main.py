@@ -45,8 +45,8 @@ def user_interaction():
             for vacancy in vacancies:
                 print(f"Название компании: {vacancy['employer_name']}")
                 print(f"Название вакансии: {vacancy['vacancy_name']}")
-                print(f"Зарплата от:       {vacancy['salary_from']}")
-                print(f"Ссылка:            {company['url_vacancy']}")
+                print(f"Зарплата:          {vacancy['salary']}")
+                print(f"Ссылка:            {vacancy['url_vacancy']}")
                 print(f"{'-' * 50}")
         elif user_input.strip() == "3":
             avg_salary = db_manager.get_avg_salary()
@@ -60,7 +60,7 @@ def user_interaction():
                 print(f"Название компании: {vacancy['employer_name']}")
                 print(f"Название вакансии: {vacancy['vacancy_name']}")
                 print(f"Зарплата от:       {vacancy['salary_from']}")
-                print(f"Ссылка:            {company['url_vacancy']}")
+                print(f"Ссылка:            {vacancy['url_vacancy']}")
                 print(f"{'-' * 50}")
         elif user_input.strip() == "5":
             keyword = check_input("Введите ключевое слово")
@@ -70,7 +70,7 @@ def user_interaction():
                 print(f"Название компании: {vacancy['employer_name']}")
                 print(f"Название вакансии: {vacancy['vacancy_name']}")
                 print(f"Зарплата от:       {vacancy['salary_from']}")
-                print(f"Ссылка:            {company['url_vacancy']}")
+                print(f"Ссылка:            {vacancy['url_vacancy']}")
                 print(f"{'-' * 50}")
         elif user_input.strip() == "6":
             break
