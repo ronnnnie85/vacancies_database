@@ -1,0 +1,45 @@
+[project]
+name = "vacancies-database"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Roman Ganiukov",email = "ronnnnie85@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "requests (>=2.32.4,<3.0.0)",
+    "psycopg2 (>=2.9.10,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.lint.dependencies]
+flake8 = "^7.3.0"
+mypy = "^1.16.1"
+isort = "^6.0.1"
+black = "^25.1.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
+pytest-cov = "^6.2.1"
+
+[tool.mypy]
+disable_error_code = ["override", "abstract"]
+disallow_untyped_defs = true
+warn_return_any = true
+exclude = [
+    "venv",
+    "tests/",
+]
+
+[tool.isort]
+line_length = 119
+
+[tool.black]
+line_length = 119
+exclude = '.git'
