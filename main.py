@@ -77,6 +77,13 @@ def user_interaction():
 
 
 def fill_database(db_name):
+    db_fill = DatabaseFilling(db_name)
+
+    user_input = check_input("Обновить данные в базе?[Y/n]")
+
+    if user_input.strip().lower() != "y":
+        return
+
     vacancies = []
     employers = []
 
@@ -85,8 +92,6 @@ def fill_database(db_name):
     for employer_id in EMPLOYERS_LIST:
         vacancies.extend(hh_api.load_vacancies(employer_id))
         employers.append(hh_api.load_employer(employer_id))
-
-    db_fill = DatabaseFilling(db_name)
 
     db_fill.employers_filling(employers)
     db_fill.vacancies_filling(vacancies)
