@@ -11,8 +11,6 @@ class DatabaseFilling:
     def __init__(self, database_name: str) -> None:
         self.__database_name = database_name
 
-        self.__database_checking()
-        self.__tables_checking()
 
     def __database_checking(self) -> None:
         params = config()
