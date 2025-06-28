@@ -12,7 +12,6 @@ NAME_KEY = "name"
 LINK_KEY = "alternate_url"
 
 
-
 SALARY_KEY = "salary"
 FROM_SALARY_KEY = "from"
 SNIPPET_KEY = "snippet"
@@ -32,6 +31,5 @@ def config(filename="database.ini", section="postgresql"):
         for param in params:
             db[param[0]] = param[1]
     else:
-        raise Exception(
-            'Section {0} is not found in the {1} file.'.format(section, filename))
+        raise Exception("Section {0} is not found in the {1} file.".format(section, filename))
     return db
