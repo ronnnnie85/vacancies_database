@@ -23,7 +23,7 @@ class DBManager:
                         employers JOIN vacancies
                         ON employers.id = vacancies.employer_id
                     GROUP BY
-                        employers.name
+                        employers.name;
                     """)
                 rows = cur.fetchall()
                 companies = []
@@ -33,7 +33,28 @@ class DBManager:
 
 
     def get_all_vacancies(self) -> list:
-        pass
+        params = config()
+
+        with psycopg2.connect(dbname=self.__database_name, **params) as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                            SELECT
+                                employers.name AS employer_name,
+                                vacancies.name AS vacancy_name,
+                                CASE 
+                                    WHEN vacancies.salary_from = 0 THEN vacancies.salary_to 
+                                    ELSE vacancies.salary_from 
+                                END AS salary,
+                                vacancies.url AS url_vacancy
+                            FROM
+                                vacancies
+                            INNER JOIN employers ON vacancies.employer_id = employers.id;
+                            """)
+                rows = cur.fetchall()
+                vacancies = []
+                for row in rows:
+                    vacancies.append({"employer_name": row[0], "vacancy_name": row[1], "salary": row[2], "url_vacancy": row[3]})
+        return vacancies
 
     def get_avg_salary(self) -> float:
         pass
