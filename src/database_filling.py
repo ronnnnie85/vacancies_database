@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2._psycopg import quote_ident
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 from src.config import config
 
@@ -19,17 +20,31 @@ class DatabaseFilling:
     def __database_checking(self) -> None:
         params = config()
 
-        with psycopg2.connect(dbname="postgres", **params) as conn:
+        try:
+            conn = psycopg2.connect(
+                dbname="postgres",
+                **params
+            )
+            conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+            conn.autocommit = True
+
             with conn.cursor() as cur:
-                conn.autocommit = True
 
                 cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (self.__database_name,))
-                exists = cur.fetchone()
 
-                if not exists:
+                if not cur.fetchone():
                     safe_db_name = quote_ident(self.__database_name, conn)
                     cur.execute(f"CREATE DATABASE {safe_db_name}")
-                    conn.commit()
+
+                    try:
+                        cur.execute(f"CREATE DATABASE {safe_db_name}")
+
+                    except Exception as create_error:
+                        raise
+        finally:
+            if 'conn' in locals():
+                conn.close()
+
 
     def __tables_checking(self) -> None:
         params = config()
@@ -57,7 +72,7 @@ class DatabaseFilling:
                     salary_to INT,
                     snippet_requirement TEXT,
                     snippet_responsibility TEXT,
-                    employer_id VARCHAR(32)
+                    employer_id VARCHAR(32),
                     FOREIGN KEY (employer_id) REFERENCES employers(id) ON DELETE CASCADE
                 );
                 """
@@ -95,12 +110,12 @@ class DatabaseFilling:
                 for vac in vacancies:
                     id_vac = vac.get("id")
                     name = vac.get("name")
-                    employer_id = vac.get("employer", {}).get("id")
-                    url = vac.get("alternate_url", "")
-                    salary_from = vac.get("salary", {}).get("from", 0)
-                    salary_to = vac.get("salary", {}).get("to", 0)
-                    snippet_requirement = vac.get("snippet", {}).get("requirement", "")
-                    snippet_responsibility = vac.get("snippet", {}).get("responsibility", "")
+                    employer_id = self.none_check(vac.get("employer"), {})
+                    url = self.none_check(vac.get("alternate_url"), "")
+                    salary_from = self.none_check(self.none_check(vac.get("salary"), {}).get("from"), 0)
+                    salary_to = self.none_check(self.none_check(vac.get("salary"), {}).get("to"), 0)
+                    snippet_requirement = self.none_check(self.none_check(vac.get("snippet"), {}).get("requirement"), "")
+                    snippet_responsibility = self.none_check(self.none_check(vac.get("snippet"), {}).get("responsibility"), "")
 
                     if id_vac and name and employer_id:
                         cur.execute("SELECT 1 FROM employers WHERE id = %s", (employer_id,))
@@ -125,3 +140,10 @@ class DatabaseFilling:
                             ),
                         )
                 conn.commit()
+
+
+    @staticmethod
+    def none_check(value, default_value):
+        if value is None:
+            return default_value
+        return value
