@@ -4,7 +4,7 @@ from src.database_filling import DatabaseFilling
 from src.db_manager import DBManager
 from src.headhunter_api import HeadHunterAPI
 
-EMPLOYERS_LIST = ["2324020", "598471", "9712671", "11631298", "11169602", "3912330", "11549620", "11419768", "4046921", "6141685",]
+EMPLOYERS_LIST = ["11549620", "11419768", "4046921", "6141685", "11169602", "5174681", "598471", "30925", "3367886", "2324020"]
 
 
 def user_interaction():

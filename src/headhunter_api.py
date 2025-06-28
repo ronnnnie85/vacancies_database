@@ -32,6 +32,8 @@ class HeadHunterAPI:
             except JSONDecodeError:
                 self.__params["page"] += 1
                 continue
+            if len(vacancy) == 0:
+                break
             vacancies.extend(vacancy)
             self.__params["page"] += 1
         self.__params["page"] = 0

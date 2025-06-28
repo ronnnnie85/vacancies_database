@@ -31,11 +31,9 @@ class DatabaseFilling:
             with conn.cursor() as cur:
 
                 cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (self.__database_name,))
-
-                if not cur.fetchone():
+                exists = cur.fetchone()
+                if not exists:
                     safe_db_name = quote_ident(self.__database_name, conn)
-                    cur.execute(f"CREATE DATABASE {safe_db_name}")
-
                     try:
                         cur.execute(f"CREATE DATABASE {safe_db_name}")
 
@@ -48,9 +46,6 @@ class DatabaseFilling:
 
     def __tables_checking(self) -> None:
         params = config()
-
-        print("DB Name:", self.__database_name)
-        print("Params:", params)
 
         with psycopg2.connect(dbname=self.__database_name, **params) as conn:
             with conn.cursor() as cur:
@@ -110,7 +105,7 @@ class DatabaseFilling:
                 for vac in vacancies:
                     id_vac = vac.get("id")
                     name = vac.get("name")
-                    employer_id = self.none_check(vac.get("employer"), {})
+                    employer_id = self.none_check(vac.get("employer"), {}).get("id")
                     url = self.none_check(vac.get("alternate_url"), "")
                     salary_from = self.none_check(self.none_check(vac.get("salary"), {}).get("from"), 0)
                     salary_to = self.none_check(self.none_check(vac.get("salary"), {}).get("to"), 0)
