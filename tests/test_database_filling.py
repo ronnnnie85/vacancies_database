@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from src.database_filling import DatabaseFilling
 
@@ -22,15 +22,12 @@ def test_employers_filling(mock_tables, mock_db_check, mock_config, mock_connect
     mock_connect.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value = mock_cursor
 
     db = DatabaseFilling("test_db")
-    employers = [
-        {"id": "1", "name": "Company A", "alternate_url": "http", "description": "desc", "open_vacancies": 5}
-    ]
+    employers = [{"id": "1", "name": "Company A", "alternate_url": "http", "description": "desc", "open_vacancies": 5}]
     db.employers_filling(employers)
 
     mock_cursor.execute.assert_any_call("SELECT 1 FROM employers WHERE id = %s", ("1",))
     mock_cursor.execute.assert_any_call(
-        "INSERT INTO employers VALUES (%s, %s, %s, %s, %s)",
-        ("1", "Company A", "http", "desc", 5)
+        "INSERT INTO employers VALUES (%s, %s, %s, %s, %s)", ("1", "Company A", "http", "desc", 5)
     )
 
 
@@ -54,10 +51,7 @@ def test_vacancies_filling(mock_tables, mock_db_check, mock_config, mock_connect
             "employer": {"id": "1"},
             "alternate_url": "http://example.com",
             "salary": {"from": 100000, "to": 150000},
-            "snippet": {
-                "requirement": "Must know Python",
-                "responsibility": "Write code"
-            }
+            "snippet": {"requirement": "Must know Python", "responsibility": "Write code"},
         }
     ]
     db.vacancies_filling(vacancies)
@@ -66,5 +60,5 @@ def test_vacancies_filling(mock_tables, mock_db_check, mock_config, mock_connect
     mock_cursor.execute.assert_any_call("SELECT 1 FROM vacancies WHERE id = %s", ("123",))
     mock_cursor.execute.assert_any_call(
         "INSERT INTO vacancies VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-        ("123", "Python Dev", "http://example.com", 100000, 150000, "Must know Python", "Write code", "1")
+        ("123", "Python Dev", "http://example.com", 100000, 150000, "Must know Python", "Write code", "1"),
     )
