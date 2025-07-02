@@ -1,5 +1,6 @@
 import pytest
 
+from src.database_filling import DatabaseFilling
 from src.db_manager import DBManager
 from src.headhunter_api import HeadHunterAPI
 
@@ -39,3 +40,5 @@ def company2_result():
             "salary": 60000,
             "url_vacancy": "http2"
         }
+
+
