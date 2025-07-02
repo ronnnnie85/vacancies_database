@@ -1,5 +1,5 @@
 from json import JSONDecodeError
-from typing import Optional
+from typing import Any, Optional
 
 import requests
 
@@ -11,13 +11,11 @@ class HeadHunterAPI:
     __headers: dict
     __params: dict
 
-
     def __init__(self) -> None:
         """Инициализирует экземпляр класса с настройками для запросов к API."""
         self.__url = ""
         self.__headers = {"User-Agent": "HH-User-Agent"}
-        self.__params = ""
-
+        self.__params = {}
 
     def load_vacancies(self, employer_id: str) -> list:
         """Загружает данные о вакансиях по id работодателя."""
@@ -41,8 +39,7 @@ class HeadHunterAPI:
         self.__params["page"] = 0
         return vacancies
 
-
-    def load_employer(self, employer_id: str) -> dict:
+    def load_employer(self, employer_id: str) -> Any:
         """Загружает данные о работодателе по id работодателя."""
         self.__params = {"page": 0, "per_page": 100}
         self.__url = f"https://api.hh.ru/employers/{employer_id}"
@@ -54,7 +51,6 @@ class HeadHunterAPI:
         except JSONDecodeError:
             return {}
         return employer_data
-
 
     def _Parser__get_request(self) -> Optional[requests.Response]:
         """Отправляет GET-запрос к API и возвращает ответ."""

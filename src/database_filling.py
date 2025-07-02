@@ -18,16 +18,12 @@ class DatabaseFilling:
         self.__database_checking()
         self.__tables_checking()
 
-
     def __database_checking(self) -> None:
         """Проверяет существование базы данных. Создаёт её, если не существует."""
         params = config()
 
         try:
-            conn = psycopg2.connect(
-                dbname="postgres",
-                **params
-            )
+            conn = psycopg2.connect(dbname="postgres", **params)
             conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
             conn.autocommit = True
 
@@ -40,42 +36,41 @@ class DatabaseFilling:
                     try:
                         cur.execute(f"CREATE DATABASE {safe_db_name}")
 
-                    except Exception as create_error:
+                    except Exception:
                         raise
         finally:
-            if 'conn' in locals():
+            if "conn" in locals():
                 conn.close()
-
 
     def __tables_checking(self) -> None:
         """Проверяет наличие необходимых таблиц в базе данных.
-            Создаёт таблицы employers и vacancies, если они отсутствуют."""
+        Создаёт таблицы employers и vacancies, если они отсутствуют."""
         params = config()
 
         with psycopg2.connect(dbname=self.__database_name, **params) as conn:
             with conn.cursor() as cur:
                 cur.execute(
                     """
-                CREATE TABLE IF NOT EXISTS employers (
-                    id VARCHAR(32) PRIMARY KEY,
-                    name VARCHAR(256) NOT NULL,
-                    url VARCHAR(256),
-                    description TEXT,
-                    open_vacancies INT
-                );
-                
-                CREATE TABLE IF NOT EXISTS vacancies (
-                    id VARCHAR(32) PRIMARY KEY,
-                    name TEXT NOT NULL,
-                    url VARCHAR(256),
-                    salary_from INT,
-                    salary_to INT,
-                    snippet_requirement TEXT,
-                    snippet_responsibility TEXT,
-                    employer_id VARCHAR(32),
-                    FOREIGN KEY (employer_id) REFERENCES employers(id) ON DELETE CASCADE
-                );
-                """
+                    CREATE TABLE IF NOT EXISTS employers (
+                        id VARCHAR(32) PRIMARY KEY,
+                        name VARCHAR(256) NOT NULL,
+                        url VARCHAR(256),
+                        description TEXT,
+                        open_vacancies INT
+                    );
+
+                    CREATE TABLE IF NOT EXISTS vacancies (
+                        id VARCHAR(32) PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        url VARCHAR(256),
+                        salary_from INT,
+                        salary_to INT,
+                        snippet_requirement TEXT,
+                        snippet_responsibility TEXT,
+                        employer_id VARCHAR(32),
+                        FOREIGN KEY (employer_id) REFERENCES employers(id) ON DELETE CASCADE
+                    );
+                    """
                 )
                 conn.commit()
 
@@ -83,7 +78,7 @@ class DatabaseFilling:
         """Заполняет таблицу работодателей."""
         params = config()
 
-        with psycopg2.connect(dbname=self.__database_name, **params)  as conn:
+        with psycopg2.connect(dbname=self.__database_name, **params) as conn:
             with conn.cursor() as cur:
                 for emp in employers:
                     id_emp = emp.get("id")
@@ -117,8 +112,12 @@ class DatabaseFilling:
                     url = self.none_check(vac.get("alternate_url"), "")
                     salary_from = self.none_check(self.none_check(vac.get("salary"), {}).get("from"), 0)
                     salary_to = self.none_check(self.none_check(vac.get("salary"), {}).get("to"), 0)
-                    snippet_requirement = self.none_check(self.none_check(vac.get("snippet"), {}).get("requirement"), "")
-                    snippet_responsibility = self.none_check(self.none_check(vac.get("snippet"), {}).get("responsibility"), "")
+                    snippet_requirement = self.none_check(
+                        self.none_check(vac.get("snippet"), {}).get("requirement"), ""
+                    )
+                    snippet_responsibility = self.none_check(
+                        self.none_check(vac.get("snippet"), {}).get("responsibility"), ""
+                    )
 
                     if id_vac and name and employer_id:
                         cur.execute("SELECT 1 FROM employers WHERE id = %s", (employer_id,))
@@ -143,7 +142,6 @@ class DatabaseFilling:
                             ),
                         )
                 conn.commit()
-
 
     @staticmethod
     def none_check(value: Any, default_value: Any) -> Any:
