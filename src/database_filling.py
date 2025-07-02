@@ -1,3 +1,5 @@
+from typing import Any
+
 import psycopg2
 from psycopg2._psycopg import quote_ident
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
@@ -12,7 +14,6 @@ class DatabaseFilling:
 
     def __init__(self, database_name: str) -> None:
         self.__database_name = database_name
-
         self.__database_checking()
         self.__tables_checking()
 
@@ -138,7 +139,7 @@ class DatabaseFilling:
 
 
     @staticmethod
-    def none_check(value, default_value):
+    def none_check(value: Any, default_value: Any) -> Any:
         if value is None:
             return default_value
         return value

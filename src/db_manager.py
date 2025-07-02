@@ -6,8 +6,10 @@ from src.config import config
 
 
 class DBManager:
+    """Класс для получения данных из БД"""
 
     __database_name: str
+
 
     def __init__(self, database_name: str) -> None:
         self.__database_name = database_name

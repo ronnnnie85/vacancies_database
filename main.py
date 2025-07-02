@@ -7,7 +7,7 @@ from src.headhunter_api import HeadHunterAPI
 EMPLOYERS_LIST = ["11549620", "11419768", "4046921", "6141685", "11169602", "5174681", "598471", "30925", "3367886", "2324020"]
 
 
-def user_interaction():
+def user_interaction() -> None:
     print("Здравствуйте")
 
     pattern = r'^[a-zA-Z_][a-zA-Z0-9_]{0,62}$'
@@ -76,7 +76,7 @@ def user_interaction():
             break
 
 
-def fill_database(db_name):
+def fill_database(db_name: str) -> None:
     db_fill = DatabaseFilling(db_name)
 
     user_input = check_input("Обновить данные в базе?[Y/n]")
