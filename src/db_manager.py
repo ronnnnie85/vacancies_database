@@ -126,7 +126,7 @@ class DBManager:
                                 vacancies INNER JOIN employers
                                 ON vacancies.employer_id = employers.id
                             WHERE
-                                vacancies.name ILIKE '%s'	"""
+                                vacancies.name ILIKE %s	"""
         vars = (f"%{keyword}%",)
 
         return self.__get_vacancies_str(self.__get_response(response_text, vars))
