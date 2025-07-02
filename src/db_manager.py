@@ -1,21 +1,24 @@
 from typing import Any
 
 import psycopg2
+from charset_normalizer.cli import query_yes_no
 
 from src.config import config
 
 
 class DBManager:
-    """Класс для получения данных из БД"""
+    """Класс для выполнения SQL-запросов и получения информации из базы данных."""
 
     __database_name: str
 
 
     def __init__(self, database_name: str) -> None:
+        """Инициализирует объект с именем базы данных."""
         self.__database_name = database_name
 
 
-    def __get_response(self, response_text: str, vars: tuple) -> list[tuple]:
+    def __get_query(self, response_text: str, vars: tuple) -> list[tuple]:
+        """Выполняет SQL-запрос и возвращает результат."""
         params = config()
 
         with psycopg2.connect(dbname=self.__database_name, **params) as conn:
@@ -27,6 +30,7 @@ class DBManager:
 
     @staticmethod
     def __get_vacancies_str(rows: list[tuple]) -> list:
+        """Преобразует строки результата запроса в список словарей с данными о вакансиях."""
         vacancies = []
         for row in rows:
             vacancies.append({"employer_name": row[0], "vacancy_name": row[1], "salary": row[2], "url_vacancy": row[3]})
@@ -34,9 +38,8 @@ class DBManager:
 
 
     def get_companies_and_vacancies_count(self) -> list:
-        params = config()
-
-        response_text = """
+        """Возвращает список компаний и количества вакансий у каждой."""
+        query_text = """
                         SELECT
                             employers.name,
                             COUNT(vacancies.id) AS vacancies_count
@@ -46,7 +49,7 @@ class DBManager:
                         GROUP BY
                             employers.name;
                         """
-        rows = self.__get_response(response_text, ())
+        rows = self.__get_query(query_text, ())
 
         companies = []
         for row in rows:
@@ -55,7 +58,8 @@ class DBManager:
 
 
     def get_all_vacancies(self) -> list:
-        response_text = """
+        """Возвращает все вакансии с названием компании, вакансии, зарплатой и ссылкой."""
+        query_text = """
                         SELECT
                             employers.name AS employer_name,
                             vacancies.name AS vacancy_name,
@@ -69,10 +73,11 @@ class DBManager:
                         INNER JOIN employers ON vacancies.employer_id = employers.id;
                         """
 
-        return self.__get_vacancies_str(self.__get_response(response_text))
+        return self.__get_vacancies_str(self.__get_query(query_text))
 
     def get_avg_salary(self) -> float:
-        response_text = """SELECT
+        """Вычисляет среднюю зарплату по всем вакансиям."""
+        query_text = """SELECT
                             AVG(CASE
                                 WHEN
                                     vacancies.salary_from = 0 THEN vacancies.salary_to
@@ -81,7 +86,7 @@ class DBManager:
                             FROM
                                 vacancies"""
 
-        avg_salary_rows = self.__get_response(response_text, ())
+        avg_salary_rows = self.__get_query(query_text, ())
         avg_salary = 0
         if len(avg_salary_rows) and len(avg_salary_rows[0]):
             avg_salary = round(avg_salary_rows[0][0], 2)
@@ -90,7 +95,8 @@ class DBManager:
 
 
     def get_vacancies_with_higher_salary(self) -> list:
-        response_text = """SELECT
+        """Возвращает вакансии с зарплатой выше средней."""
+        query_text = """SELECT
                                 employers.name AS employer_name,
                                 vacancies.name AS vacancy_name,
                                 CASE 
@@ -113,10 +119,11 @@ class DBManager:
                                         FROM
                                             vacancies)"""
 
-        return self.__get_vacancies_str(self.__get_response(response_text, ()))
+        return self.__get_vacancies_str(self.__get_query(query_text, ()))
 
     def get_vacancies_with_keyword(self, keyword: str) -> list:
-        response_text = """SELECT
+        """Возвращает вакансии, в названии которых содержится ключевое слово."""
+        query_text = """SELECT
                                 employers.name AS employer_name,
                                 vacancies.name AS vacancy_name,
                                 CASE
@@ -131,6 +138,6 @@ class DBManager:
                                 vacancies.name ILIKE %s	"""
         vars = (f"%{keyword}%",)
 
-        return self.__get_vacancies_str(self.__get_response(response_text, vars))
+        return self.__get_vacancies_str(self.__get_query(query_text, vars))
 
 

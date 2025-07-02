@@ -13,12 +13,14 @@ class DatabaseFilling:
     __database_name: str
 
     def __init__(self, database_name: str) -> None:
+        """Инициализирует объект и проверяет существование БД и таблиц."""
         self.__database_name = database_name
         self.__database_checking()
         self.__tables_checking()
 
 
     def __database_checking(self) -> None:
+        """Проверяет существование базы данных. Создаёт её, если не существует."""
         params = config()
 
         try:
@@ -46,6 +48,8 @@ class DatabaseFilling:
 
 
     def __tables_checking(self) -> None:
+        """Проверяет наличие необходимых таблиц в базе данных.
+            Создаёт таблицы employers и vacancies, если они отсутствуют."""
         params = config()
 
         with psycopg2.connect(dbname=self.__database_name, **params) as conn:
@@ -76,6 +80,7 @@ class DatabaseFilling:
                 conn.commit()
 
     def employers_filling(self, employers: list) -> None:
+        """Заполняет таблицу работодателей."""
         params = config()
 
         with psycopg2.connect(dbname=self.__database_name, **params)  as conn:
@@ -99,6 +104,8 @@ class DatabaseFilling:
                 conn.commit()
 
     def vacancies_filling(self, vacancies: list) -> None:
+        """Заполняет таблицу вакансий."""
+
         params = config()
 
         with psycopg2.connect(dbname=self.__database_name, **params) as conn:
@@ -140,6 +147,7 @@ class DatabaseFilling:
 
     @staticmethod
     def none_check(value: Any, default_value: Any) -> Any:
+        """Возвращает значение по умолчанию, если значение None."""
         if value is None:
             return default_value
         return value
