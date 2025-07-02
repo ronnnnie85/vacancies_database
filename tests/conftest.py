@@ -1,11 +1,16 @@
 import pytest
 
+from src.db_manager import DBManager
 from src.headhunter_api import HeadHunterAPI
 
 
 @pytest.fixture
 def hh_api():
     return HeadHunterAPI()
+
+@pytest.fixture
+def test_db():
+    return DBManager("test_db")
 
 
 @pytest.fixture
