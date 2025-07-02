@@ -59,7 +59,7 @@ def user_interaction():
             for vacancy in vacancies:
                 print(f"Название компании: {vacancy['employer_name']}")
                 print(f"Название вакансии: {vacancy['vacancy_name']}")
-                print(f"Зарплата от:       {vacancy['salary_from']}")
+                print(f"Зарплата:          {vacancy['salary']}")
                 print(f"Ссылка:            {vacancy['url_vacancy']}")
                 print(f"{'-' * 50}")
         elif user_input.strip() == "5":
@@ -69,7 +69,7 @@ def user_interaction():
             for vacancy in vacancies:
                 print(f"Название компании: {vacancy['employer_name']}")
                 print(f"Название вакансии: {vacancy['vacancy_name']}")
-                print(f"Зарплата от:       {vacancy['salary_from']}")
+                print(f"Зарплата:          {vacancy['salary']}")
                 print(f"Ссылка:            {vacancy['url_vacancy']}")
                 print(f"{'-' * 50}")
         elif user_input.strip() == "6":
