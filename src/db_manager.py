@@ -79,7 +79,7 @@ class DBManager:
                             FROM
                                 vacancies"""
 
-        avg_salary_rows = self.get_response(response_text, ())
+        avg_salary_rows = self.__get_response(response_text, ())
         avg_salary = 0
         if len(avg_salary_rows) and len(avg_salary_rows[0]):
             avg_salary = round(avg_salary_rows[0][0], 2)
