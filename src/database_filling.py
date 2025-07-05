@@ -54,15 +54,15 @@ class DatabaseFilling:
                     CREATE TABLE IF NOT EXISTS employers (
                         id VARCHAR(32) PRIMARY KEY,
                         name VARCHAR(256) NOT NULL,
-                        url VARCHAR(256),
+                        url TEXT,
                         description TEXT,
                         open_vacancies INT
                     );
 
                     CREATE TABLE IF NOT EXISTS vacancies (
                         id VARCHAR(32) PRIMARY KEY,
-                        name TEXT NOT NULL,
-                        url VARCHAR(256),
+                        name VARCHAR(256) NOT NULL,
+                        url TEXT,
                         salary_from INT,
                         salary_to INT,
                         snippet_requirement TEXT,
